@@ -39,8 +39,9 @@ export default function ChatPanel({
   }
 
   return (
-    <aside className="glass-panel absolute inset-x-3 bottom-3 z-20 flex max-h-[min(78vh,720px)] flex-col overflow-hidden rounded-lg text-zinc-100 shadow-2xl sm:inset-y-4 sm:left-auto sm:right-4 sm:max-h-none sm:w-[min(430px,calc(100vw-2rem))]">
-      <header className="border-b border-white/10 px-4 py-4">
+    <aside className="control-deck absolute inset-x-3 bottom-3 z-20 flex max-h-[min(80vh,740px)] flex-col overflow-hidden rounded-lg text-zinc-100 shadow-2xl sm:inset-y-4 sm:left-auto sm:right-4 sm:max-h-none sm:w-[min(430px,calc(100vw-2rem))]">
+      <header className="relative overflow-hidden border-b border-white/10 px-4 py-4">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-200 via-emerald-200 to-amber-200" />
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
@@ -52,16 +53,16 @@ export default function ChatPanel({
                 }`}
               />
               <p className="truncate text-base font-semibold tracking-tight">
-                Anonymous signal
+                Private signal
               </p>
             </div>
             <p className="mt-1 text-xs text-zinc-400">
-              {connected ? "Connected peer to peer" : "Opening private channel"}
+              {connected ? "Peer-to-peer channel open" : "Opening private path"}
             </p>
           </div>
           <button
             onClick={onEnd}
-            className="rounded-full bg-rose-500 px-3.5 py-2 text-sm font-semibold text-white shadow-lg shadow-rose-950/30 transition hover:bg-rose-400 active:scale-95"
+            className="rounded-full bg-rose-400 px-3.5 py-2 text-sm font-semibold text-zinc-950 shadow-lg shadow-rose-950/30 transition hover:bg-rose-300 active:scale-95"
           >
             End
           </button>
@@ -83,14 +84,32 @@ export default function ChatPanel({
             Video
           </button>
         </div>
+
+        <div className="mt-4 grid grid-cols-3 gap-2 text-[11px] text-zinc-400">
+          <div className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-2">
+            <p className="font-medium text-zinc-100">{messages.length}</p>
+            <p>messages</p>
+          </div>
+          <div className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-2">
+            <p className="font-medium text-emerald-100">Live</p>
+            <p>session</p>
+          </div>
+          <div className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-2">
+            <p className="font-medium text-amber-100">Fresh</p>
+            <p>history</p>
+          </div>
+        </div>
       </header>
 
-      <div className="chat-scroll flex-1 space-y-3 overflow-y-auto px-4 py-5">
+      <div className="chat-scroll flex-1 space-y-3 overflow-y-auto bg-black/[0.12] px-4 py-5">
         {messages.length === 0 && (
-          <div className="mx-auto mt-8 max-w-56 text-center">
-            <p className="text-sm font-medium text-zinc-200">Start with hello.</p>
+          <div className="mx-auto mt-8 max-w-60 text-center">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-cyan-200/20 bg-cyan-200/10">
+              <span className="brand-glyph brand-glyph-xs" aria-hidden="true" />
+            </div>
+            <p className="text-sm font-medium text-zinc-200">Room is open.</p>
             <p className="mt-2 text-xs leading-relaxed text-zinc-500">
-              This room disappears when the connection ends.
+              The conversation disappears when either side leaves.
             </p>
           </div>
         )}
@@ -115,7 +134,7 @@ export default function ChatPanel({
 
       <form
         onSubmit={submit}
-        className="flex gap-2 border-t border-white/10 bg-zinc-950/35 p-3"
+        className="flex gap-2 border-t border-white/10 bg-zinc-950/45 p-3"
       >
         <input
           value={draft}
@@ -127,7 +146,7 @@ export default function ChatPanel({
         <button
           type="submit"
           disabled={!connected || !draft.trim()}
-          className="rounded-full bg-emerald-300 px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-lg shadow-emerald-950/20 transition hover:bg-cyan-200 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-lg shadow-cyan-950/20 transition hover:bg-cyan-100 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Send
         </button>

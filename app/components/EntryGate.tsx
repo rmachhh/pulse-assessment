@@ -36,105 +36,72 @@ export default function EntryGate({
   }
 
   return (
-    <div className="relative flex min-h-full flex-1 flex-col items-center justify-center gap-10 overflow-hidden bg-zinc-950 px-6 py-16 text-zinc-100 sm:py-12">
-      {/* Ambient background: radial gradient + subtle noise feel */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(16,185,129,0.08)_0%,_transparent_70%)]" />
+    <div className="entry-shell relative flex min-h-full flex-1 flex-col items-center justify-center overflow-hidden bg-[#07070a] px-6 py-16 text-zinc-100 sm:py-12">
+      <div className="entry-grid" aria-hidden="true" />
+      <div className="entry-aurora entry-aurora-a" aria-hidden="true" />
+      <div className="entry-aurora entry-aurora-b" aria-hidden="true" />
 
-      {/* Floating background dots */}
-      <div
-        className="pointer-events-none absolute h-2 w-2 rounded-full bg-emerald-400/30"
-        style={{
-          left: "15%",
-          top: "25%",
-          animation: "float-1 6s ease-in-out infinite",
-        }}
-      />
-      <div
-        className="pointer-events-none absolute h-1.5 w-1.5 rounded-full bg-emerald-400/20"
-        style={{
-          right: "20%",
-          top: "30%",
-          animation: "float-2 8s ease-in-out infinite",
-        }}
-      />
-      <div
-        className="pointer-events-none absolute h-2.5 w-2.5 rounded-full bg-emerald-400/25"
-        style={{
-          left: "25%",
-          bottom: "30%",
-          animation: "float-3 7s ease-in-out infinite",
-        }}
-      />
-      <div
-        className="pointer-events-none absolute h-1.5 w-1.5 rounded-full bg-emerald-400/20"
-        style={{
-          right: "25%",
-          bottom: "25%",
-          animation: "float-1 5s ease-in-out infinite 1s",
-        }}
-      />
-      <div
-        className="pointer-events-none absolute h-1 w-1 rounded-full bg-white/10"
-        style={{
-          left: "60%",
-          top: "20%",
-          animation: "float-2 9s ease-in-out infinite 2s",
-        }}
-      />
+      <div className="pointer-events-none absolute left-[15%] top-[24%] h-2 w-2 rounded-full bg-cyan-200/35 shadow-[0_0_22px_rgba(103,232,249,0.45)] [animation:float-1_6s_ease-in-out_infinite]" />
+      <div className="pointer-events-none absolute right-[18%] top-[31%] h-1.5 w-1.5 rounded-full bg-emerald-200/30 shadow-[0_0_18px_rgba(110,231,183,0.38)] [animation:float-2_8s_ease-in-out_infinite]" />
+      <div className="pointer-events-none absolute bottom-[26%] left-[24%] h-2.5 w-2.5 rounded-full bg-amber-200/25 shadow-[0_0_18px_rgba(253,230,138,0.32)] [animation:float-3_7s_ease-in-out_infinite]" />
+      <div className="pointer-events-none absolute bottom-[24%] right-[26%] h-1.5 w-1.5 rounded-full bg-rose-200/20 shadow-[0_0_16px_rgba(253,164,175,0.28)] [animation:float-1_5s_ease-in-out_infinite_1s]" />
 
-      {/* Logo */}
-      <div className="flex flex-col items-center gap-8">
-        {/* Pulsing logo ring */}
-        <div className="animate-logo-ring relative flex h-32 w-32 items-center justify-center rounded-full bg-emerald-400/10 ring-1 ring-emerald-400/25">
-          <div className="animate-logo-pulse flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-300 to-emerald-500 shadow-2xl shadow-emerald-400/50">
-            <div className="h-3.5 w-3.5 rounded-full bg-zinc-950" />
-          </div>
+      <div className="relative z-10 flex w-full max-w-xl flex-col items-center text-center">
+        <div className="relative flex h-48 w-48 items-center justify-center sm:h-56 sm:w-56">
+          <div className="absolute inset-0 rounded-full border border-cyan-200/10 bg-white/[0.02] shadow-[inset_0_0_70px_rgba(103,232,249,0.08)]" />
+          <div className="absolute inset-8 rounded-full border border-emerald-200/10 [animation:slow-spin_18s_linear_infinite]" />
+          <div className="absolute inset-16 rounded-full border border-dashed border-amber-200/20 [animation:slow-spin_12s_linear_infinite_reverse]" />
+          <div className="radar-sweep" />
+          <span className="brand-glyph brand-glyph-lg" aria-hidden="true" />
+          <span className="absolute h-3 w-3 translate-x-20 -translate-y-10 rounded-full bg-cyan-200 shadow-[0_0_28px_rgba(103,232,249,0.75)]" />
+          <span className="absolute h-2.5 w-2.5 -translate-x-20 translate-y-12 rounded-full bg-emerald-200 shadow-[0_0_24px_rgba(110,231,183,0.7)]" />
         </div>
 
-        {/* Title */}
-        <div className="text-center">
-          <h1 className="bg-gradient-to-b from-white to-zinc-400 bg-clip-text text-6xl font-bold tracking-tight text-transparent">
-            Pulse
-          </h1>
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-zinc-500">
-            A living globe of anonymous strangers.
-            <br />
-            Drop onto the map and connect.
+        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.32em] text-cyan-200/80">
+          anonymous global presence
+        </p>
+        <h1 className="mt-4 bg-gradient-to-b from-white via-zinc-100 to-zinc-500 bg-clip-text text-6xl font-semibold tracking-normal text-transparent sm:text-7xl">
+          Pulse
+        </h1>
+        <p className="mt-4 max-w-sm text-sm leading-7 text-zinc-400">
+          A living globe of anonymous strangers. Drop onto the map and connect
+          for a private, temporary room.
+        </p>
+
+        <button
+          onClick={enter}
+          disabled={status === "locating"}
+          className="group relative mt-9 inline-flex min-h-14 min-w-44 items-center justify-center overflow-hidden rounded-full bg-white px-8 text-sm font-semibold text-zinc-950 shadow-2xl shadow-cyan-950/40 transition hover:bg-cyan-100 active:scale-[0.98] disabled:cursor-wait disabled:opacity-70"
+        >
+          <span className="absolute inset-0 translate-x-[-120%] bg-gradient-to-r from-transparent via-cyan-200/70 to-transparent transition duration-700 group-hover:translate-x-[120%]" />
+          {status === "locating" ? (
+            <span className="relative flex items-center gap-2">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-zinc-950/70" />
+              Locating signal
+            </span>
+          ) : (
+            <span className="relative">Enter Pulse</span>
+          )}
+        </button>
+
+        {status === "error" && (
+          <p className="animate-modal-in mt-5 max-w-md rounded-lg border border-rose-300/20 bg-rose-400/10 px-4 py-3 text-sm leading-relaxed text-rose-100">
+            {error}
           </p>
+        )}
+
+        <div className="mt-7 flex flex-wrap justify-center gap-2 text-xs text-zinc-500">
+          <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">
+            No sign-up
+          </span>
+          <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">
+            1-3 km location blur
+          </span>
+          <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">
+            Nothing stored
+          </span>
         </div>
       </div>
-
-      {/* Button */}
-      <button
-        onClick={enter}
-        disabled={status === "locating"}
-        className="group relative rounded-full bg-emerald-400 px-10 py-3.5 text-base font-semibold text-zinc-950 shadow-lg shadow-emerald-400/30 transition-all duration-300 hover:bg-emerald-300 hover:shadow-emerald-400/50 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:hover:scale-100 disabled:hover:bg-emerald-400 disabled:hover:shadow-emerald-400/30"
-      >
-        {/* Inner glow on hover */}
-        <span className="absolute inset-0 rounded-full bg-white/0 transition-colors group-hover:bg-white/10" />
-        {status === "locating" ? (
-          <span className="flex items-center gap-2">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-zinc-950/60" />
-            Locating…
-          </span>
-        ) : (
-          "Enter Pulse"
-        )}
-      </button>
-
-      {/* Error */}
-      {status === "error" && (
-        <p className="-mt-4 max-w-xs text-center text-sm text-red-400 animate-modal-in">
-          {error}
-        </p>
-      )}
-
-      {/* Footer */}
-      <p className="absolute bottom-[max(3.5rem,env(safe-area-inset-bottom))] max-w-sm px-6 text-center text-xs leading-relaxed text-zinc-600 sm:bottom-6">
-        No sign-up. Your dot is placed 1–3 km from your real location.
-        <br />
-        Nothing is stored — closing the tab ends everything.
-      </p>
     </div>
   );
 }

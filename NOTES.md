@@ -55,3 +55,12 @@
         - Restyled connection and video prompts so requests feel like part of the same product language.
         - Added a more premium video waiting state and live-call header.
     - Thinking: The live room should feel like stepping into a private global radar. The UI now frames the map as the main experience while keeping chat, requests, and video calm, focused, and visually connected.
+- Full Product Redesign
+    - Before: The app had polished pieces, but the entry, map, chat, prompts, and video still felt like separate surfaces.
+    - Changes:
+        - Rebuilt the entry screen around an inviting centered "living pulse" concept with a custom animated brand mark and ambient signal dots.
+        - Replaced the map HUD with a stronger control-deck interface, metric tiles, signal density, and a more premium live-room feel.
+        - Redesigned the chat panel as a private signal room with session stats, a stronger empty state, and clearer action hierarchy.
+        - Reworked connection prompts into focused incoming-signal cards with handshake progress.
+        - Gave the video call a matching media-channel surface with a richer waiting state and cleaner call controls.
+    - Thinking: I wanted Pulse to feel memorable from the first second without feeling like a marketing site. The gate should feel quiet, alive, and inviting, like stepping into a live signal rather than reading a landing page.

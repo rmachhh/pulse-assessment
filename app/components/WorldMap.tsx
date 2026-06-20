@@ -70,7 +70,7 @@ export default function WorldMap({
         });
         map.addControl(
           new mapboxgl.NavigationControl({ visualizePitch: true }),
-          "bottom-right",
+          "top-right",
         );
         if (!cancelled) setReady(true);
       });
@@ -188,33 +188,43 @@ export default function WorldMap({
         </div>
       )}
 
-      <section className="glass-panel absolute left-3 top-3 w-[calc(100%-1.5rem)] max-w-sm rounded-lg p-4 text-zinc-100 sm:left-5 sm:top-5 sm:w-80">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200/80">
-              Pulse Live
-            </p>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight">World room</h1>
+      <section className="control-deck absolute left-3 top-3 w-[calc(100%-1.5rem)] max-w-[390px] rounded-lg p-4 text-zinc-100 sm:left-5 sm:top-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="brand-glyph brand-glyph-xs shrink-0" aria-hidden="true" />
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200/80">
+                Pulse live
+              </p>
+              <h1 className="mt-1 truncate text-2xl font-semibold tracking-normal">
+                World room
+              </h1>
+            </div>
           </div>
-          <span className="live-orb" aria-hidden="true" />
+          <span className="live-orb mt-1 shrink-0" aria-hidden="true" />
         </div>
-        <div className="mt-4 grid grid-cols-3 gap-2 text-xs text-zinc-300">
-          <div>
-            <p className="text-2xl font-semibold text-white">{peers.length}</p>
+
+        <div className="mt-5 grid grid-cols-3 gap-2">
+          <div className="metric-tile">
+            <p className="text-3xl font-semibold text-white">{peers.length}</p>
             <p>online</p>
           </div>
-          <div>
-            <p className="text-2xl font-semibold text-emerald-200">P2P</p>
-            <p>chat</p>
+          <div className="metric-tile">
+            <p className="text-3xl font-semibold text-emerald-100">P2P</p>
+            <p>private</p>
           </div>
-          <div>
-            <p className="text-2xl font-semibold text-amber-200">1-3km</p>
-            <p>blur</p>
+          <div className="metric-tile">
+            <p className="text-3xl font-semibold text-amber-100">1-3</p>
+            <p>km blur</p>
           </div>
+        </div>
+
+        <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10">
+          <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-cyan-200 via-emerald-200 to-amber-200 shadow-[0_0_24px_rgba(103,232,249,0.35)]" />
         </div>
       </section>
 
-      <div className="glass-panel absolute bottom-4 left-3 rounded-lg px-4 py-3 text-xs text-zinc-200 sm:left-5">
+      <div className="control-deck absolute bottom-4 left-3 rounded-lg px-4 py-3 text-xs text-zinc-200 sm:left-5">
         <div className="flex items-center gap-3">
           <div className="signal-bars" aria-hidden="true">
             <span />
@@ -225,8 +235,20 @@ export default function WorldMap({
             <p className="font-medium text-white">
               {canConnect ? "Ready to connect" : "Connection in progress"}
             </p>
-            <p className="text-zinc-400">Live presence updating</p>
+            <p className="text-zinc-400">Presence signal active</p>
           </div>
+        </div>
+      </div>
+
+      <div className="pointer-events-none absolute bottom-4 right-4 hidden w-48 rounded-lg border border-white/10 bg-black/20 p-3 text-xs text-zinc-400 backdrop-blur-md sm:block">
+        <div className="mb-2 flex items-center justify-between text-zinc-200">
+          <span>Signal density</span>
+          <span>{Math.min(100, peers.length * 12)}%</span>
+        </div>
+        <div className="space-y-1.5">
+          <span className="block h-1 rounded-full bg-cyan-200/80" />
+          <span className="block h-1 w-3/4 rounded-full bg-emerald-200/70" />
+          <span className="block h-1 w-1/2 rounded-full bg-amber-200/70" />
         </div>
       </div>
     </div>
