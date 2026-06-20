@@ -36,3 +36,13 @@
     - How: started a video call, the video took over the whole screen hiding all the controls including the little thumbnail.
     - Cause: the remote video had no size limit and leaked past its container, covering the controls. The thumbnail sat behind it with z-index.
     - Fix: added overflow-hidden to crop the frame so the video stays inside, and gave the little selfie thumbnail a proper layer
+# Phase 2
+- EntryGate Redesigned
+    - Before: The first screen used to be just a title on a black background. Now it feels alive.
+    - Changes:
+        - A glowing green logo pulses in the center, like a heartbeat.
+        - Tiny floating dots, matching the ones you'll see on the map later.
+        - The title has a subtle shine, like light catching the top of the letters.
+        - The button lifts slightly when you hover over it and presses down when you click.
+        - When it's finding your location, a little blinking dot appears.
+    - Thinking: I want to achieve a design that feels alive and breathing, to catch user attention. So i added a pulsing animation that signals "live" or "connected" and make the overall entry gate feels alive.
