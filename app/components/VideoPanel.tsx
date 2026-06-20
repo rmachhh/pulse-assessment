@@ -53,8 +53,8 @@ export default function VideoPanel({
         <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/80 to-transparent" />
         <div className="control-deck absolute left-3 right-3 top-3 flex items-center justify-between rounded-lg px-3 py-2 text-xs sm:left-5 sm:right-auto sm:top-5 sm:min-w-64">
           <div>
-            <p className="font-medium text-white">Live video</p>
-            <p className="text-zinc-500">Peer media channel</p>
+            <p className="font-medium text-white">Video call</p>
+            <p className="text-zinc-500">You are together now</p>
           </div>
           <span className="h-2 w-2 rounded-full bg-rose-300 shadow-[0_0_14px_rgba(253,164,175,0.8)]" />
         </div>

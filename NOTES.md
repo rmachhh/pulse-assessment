@@ -37,19 +37,10 @@
     - Cause: the remote video had no size limit and leaked past its container, covering the controls. The thumbnail sat behind it with z-index.
     - Fix: added overflow-hidden to crop the frame so the video stays inside, and gave the little selfie thumbnail a proper layer
 # Phase 2
-- EntryGate Redesigned
-    - Before: The first screen used to be just a title on a black background. Now it feels alive.
-    - Changes:
-        - A glowing green logo pulses in the center, like a heartbeat.
-        - Tiny floating dots, matching the ones you'll see on the map later.
-        - The title has a subtle shine, like light catching the top of the letters.
-        - The button lifts slightly when you hover over it and presses down when you click.
-        - When it's finding your location, a little blinking dot appears.
-    - Thinking: I want to achieve a design that feels alive and breathing, to catch user attention. So i added a pulsing animation that signals "live" or "connected" and make the overall entry gate feels alive.
 - Live Room Polish
     - Before: After entering, the experience became mostly plain map + basic panels.
     - Changes:
-        - Added a glass-style live HUD over the map with online count, privacy blur, and P2P status.
+        - Added a glass-style live HUD over the map with online count, privacy reassurance, and private chat status.
         - Upgraded map dots with stronger glow, hover feedback, and a clearer busy state.
         - Reworked the chat into a polished responsive side sheet with connection progress, softer message bubbles, and smooth message entry.
         - Restyled connection and video prompts so requests feel like part of the same product language.
@@ -58,9 +49,9 @@
 - Full Product Redesign
     - Before: The app had polished pieces, but the entry, map, chat, prompts, and video still felt like separate surfaces.
     - Changes:
-        - Rebuilt the entry screen around an inviting centered "living pulse" concept with a custom animated brand mark and ambient signal dots.
-        - Replaced the map HUD with a stronger control-deck interface, metric tiles, signal density, and a more premium live-room feel.
-        - Redesigned the chat panel as a private signal room with session stats, a stronger empty state, and clearer action hierarchy.
-        - Reworked connection prompts into focused incoming-signal cards with handshake progress.
+        - Rebuilt the entry screen around an inviting centered "living pulse" concept with a custom animated brand mark and ambient dots.
+        - Replaced the map HUD with a warmer live-map interface, readable activity cards, and a more premium room feel.
+        - Redesigned the chat panel as a private room with friendly status text, a stronger empty state, and clearer action hierarchy.
+        - Reworked connection prompts into focused invitation cards with simple waiting progress.
         - Gave the video call a matching media-channel surface with a richer waiting state and cleaner call controls.
-    - Thinking: I wanted Pulse to feel memorable from the first second without feeling like a marketing site. The gate should feel quiet, alive, and inviting, like stepping into a live signal rather than reading a landing page.
+    - Thinking: I wanted Pulse to feel memorable from the first second without feeling like a marketing site. The gate should feel quiet, alive, and inviting, like stepping into a room where people are already present.

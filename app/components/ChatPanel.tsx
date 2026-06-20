@@ -53,11 +53,11 @@ export default function ChatPanel({
                 }`}
               />
               <p className="truncate text-base font-semibold tracking-tight">
-                Private signal
+                Private chat
               </p>
             </div>
             <p className="mt-1 text-xs text-zinc-400">
-              {connected ? "Peer-to-peer channel open" : "Opening private path"}
+              {connected ? "You are connected" : "Connecting..."}
             </p>
           </div>
           <button
@@ -91,11 +91,11 @@ export default function ChatPanel({
             <p>messages</p>
           </div>
           <div className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-2">
-            <p className="font-medium text-emerald-100">Live</p>
-            <p>session</p>
+            <p className="font-medium text-emerald-100">Now</p>
+            <p>online</p>
           </div>
           <div className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-2">
-            <p className="font-medium text-amber-100">Fresh</p>
+            <p className="font-medium text-amber-100">No</p>
             <p>history</p>
           </div>
         </div>

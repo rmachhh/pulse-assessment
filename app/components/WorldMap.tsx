@@ -155,7 +155,7 @@ export default function WorldMap({
         }
         const element = marker.getElement();
         element.classList.toggle("is-busy", peer.busy);
-        element.setAttribute("aria-label", peer.busy ? "Peer is busy" : "Tap to connect");
+        element.setAttribute("aria-label", peer.busy ? "Person is busy" : "Tap to connect");
       }
 
       // Drop markers for peers that went offline / got filtered out.
@@ -188,39 +188,51 @@ export default function WorldMap({
         </div>
       )}
 
-      <section className="control-deck absolute left-3 top-3 w-[calc(100%-1.5rem)] max-w-[390px] rounded-lg p-4 text-zinc-100 sm:left-5 sm:top-5">
+      <section className="control-deck absolute left-3 top-3 w-[calc(100%-1.5rem)] max-w-[410px] rounded-lg p-4 text-zinc-100 sm:left-5 sm:top-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <span className="brand-glyph brand-glyph-xs shrink-0" aria-hidden="true" />
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200/80">
-                Pulse live
+                Pulse
               </p>
               <h1 className="mt-1 truncate text-2xl font-semibold tracking-normal">
-                World room
+                World map
               </h1>
             </div>
           </div>
           <span className="live-orb mt-1 shrink-0" aria-hidden="true" />
         </div>
 
-        <div className="mt-5 grid grid-cols-3 gap-2">
-          <div className="metric-tile">
-            <p className="text-3xl font-semibold text-white">{peers.length}</p>
-            <p>online</p>
+        <div className="mt-5 grid grid-cols-[0.9fr_1.1fr] gap-3">
+          <div className="metric-tile flex items-end gap-2 p-3">
+            <p className="text-4xl font-semibold leading-none text-white">
+              {peers.length}
+            </p>
+            <p className="pb-1 text-xs leading-tight text-zinc-400">
+              people
+              <br />
+              online
+            </p>
           </div>
-          <div className="metric-tile">
-            <p className="text-3xl font-semibold text-emerald-100">P2P</p>
-            <p>private</p>
-          </div>
-          <div className="metric-tile">
-            <p className="text-3xl font-semibold text-amber-100">1-3</p>
-            <p>km blur</p>
+
+          <div className="space-y-2">
+            <div className="metric-tile p-3">
+              <p className="font-semibold text-emerald-100">Private chat</p>
+              <p className="mt-0.5 text-xs text-zinc-500">Gone when you leave.</p>
+            </div>
+            <div className="metric-tile p-3">
+              <p className="font-semibold text-amber-100">Approximate location</p>
+              <p className="mt-0.5 text-xs text-zinc-500">Nearby, never exact.</p>
+            </div>
           </div>
         </div>
 
-        <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10">
-          <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-cyan-200 via-emerald-200 to-amber-200 shadow-[0_0_24px_rgba(103,232,249,0.35)]" />
+        <div className="mt-4 flex items-center gap-3">
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
+            <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-cyan-200 via-emerald-200 to-amber-200 shadow-[0_0_24px_rgba(103,232,249,0.35)]" />
+          </div>
+          <span className="text-xs text-zinc-500">live now</span>
         </div>
       </section>
 
@@ -233,16 +245,16 @@ export default function WorldMap({
           </div>
           <div>
             <p className="font-medium text-white">
-              {canConnect ? "Ready to connect" : "Connection in progress"}
+              {canConnect ? "Tap a dot to say hello" : "Connecting..."}
             </p>
-            <p className="text-zinc-400">Presence signal active</p>
+            <p className="text-zinc-400">The map updates as people come and go</p>
           </div>
         </div>
       </div>
 
       <div className="pointer-events-none absolute bottom-4 right-4 hidden w-48 rounded-lg border border-white/10 bg-black/20 p-3 text-xs text-zinc-400 backdrop-blur-md sm:block">
         <div className="mb-2 flex items-center justify-between text-zinc-200">
-          <span>Signal density</span>
+          <span>Room activity</span>
           <span>{Math.min(100, peers.length * 12)}%</span>
         </div>
         <div className="space-y-1.5">

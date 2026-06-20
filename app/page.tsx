@@ -343,7 +343,7 @@ export default function Home() {
       {conn.kind === "requesting" && (
         <div className="control-deck animate-modal-in absolute left-1/2 top-20 z-30 flex -translate-x-1/2 items-center gap-3 rounded-full px-4 py-2 text-sm text-zinc-100 shadow-lg">
           <span className="h-2 w-2 animate-pulse rounded-full bg-amber-200 shadow-[0_0_16px_rgba(253,230,138,0.8)]" />
-          <span>Opening signal…</span>
+          <span>Asking to connect…</span>
           <button
             onClick={cancelRequest}
             className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium transition hover:bg-white/20 active:scale-95"

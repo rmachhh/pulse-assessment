@@ -58,7 +58,7 @@ export default function EntryGate({
         </div>
 
         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.32em] text-cyan-200/80">
-          anonymous global presence
+          people are here now
         </p>
         <h1 className="mt-4 bg-gradient-to-b from-white via-zinc-100 to-zinc-500 bg-clip-text text-6xl font-semibold tracking-normal text-transparent sm:text-7xl">
           Pulse
@@ -77,7 +77,7 @@ export default function EntryGate({
           {status === "locating" ? (
             <span className="relative flex items-center gap-2">
               <span className="h-2 w-2 animate-pulse rounded-full bg-zinc-950/70" />
-              Locating signal
+              Finding your spot
             </span>
           ) : (
             <span className="relative">Enter Pulse</span>
@@ -95,7 +95,7 @@ export default function EntryGate({
             No sign-up
           </span>
           <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">
-            1-3 km location blur
+            Approximate location
           </span>
           <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">
             Nothing stored

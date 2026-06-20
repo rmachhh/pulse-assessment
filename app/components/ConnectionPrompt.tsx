@@ -27,7 +27,7 @@ export default function ConnectionPrompt({
           </div>
           <div className="min-w-0 flex-1 text-left">
             <p className="text-xs font-semibold uppercase tracking-[0.26em] text-cyan-200/80">
-              Incoming signal
+              Someone is here
             </p>
             <h2 className="mt-2 text-balance text-2xl font-semibold tracking-normal text-white">
               {title}
@@ -42,8 +42,8 @@ export default function ConnectionPrompt({
 
         <div className="mt-6 rounded-lg border border-white/10 bg-black/20 p-3">
           <div className="flex items-center justify-between text-xs text-zinc-400">
-            <span>Signal handshake</span>
-            <span className="text-emerald-100">waiting</span>
+            <span>Waiting for your answer</span>
+            <span className="text-emerald-100">new</span>
           </div>
           <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
             <div className="h-full w-3/5 animate-pulse rounded-full bg-gradient-to-r from-cyan-200 via-emerald-200 to-amber-200" />
