@@ -6,9 +6,12 @@
     - Cause: crypto.randomUUID() only exist when browsing securely
     - Fix: A small utility that tries the native API first, then falls back to a manual UUID v4 using crypto.getRandomValues()
 - Stuck at connecting... - The channel never opens
-    - How: two users connect, two users just stuck on connecting without actually go to connected status
+    - How: Tried to connect to one of the user using incognito, but stuck at connecting
     - Cause 1: pending ICE candidates were flushed before the remote description was set
     - Cause 2: setLocalDescription() was called without an explicit offer/answer, which fails in many browsers
     - Fix 1: reordered flushPendingCandidates() to run after setRemoteDescription();
     - Fix 2: Instead of calling setLocalDescription() empty-handed, we now create the offer/answer first (createOffer() / createAnswer()) and then pass it to setLocalDescription().
-- 
+- Messages are not being sent to each other
+    - How: Upon successfully connected, i tried sending a message but the counterpart did not received it.
+    - Cause: the sendChat() function that send a chat uses different chat type than the receiver, hence the message is silently discarded.
+    - Fix: change the sendChat() function to send to the same chat type as the receiver which is the "chat" type.
