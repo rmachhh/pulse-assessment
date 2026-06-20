@@ -43,7 +43,8 @@ export class PeerSession {
     this.pc.onnegotiationneeded = async () => {
       try {
         this.makingOffer = true;
-        await this.pc.setLocalDescription();
+        const offer = await this.pc.createOffer();
+        await this.pc.setLocalDescription(offer);
         if (this.pc.localDescription) {
           this.cb.onSignal("offer", JSON.stringify(this.pc.localDescription));
         }
@@ -107,10 +108,11 @@ export class PeerSession {
     this.ignoreOffer = !this.polite && offerCollision;
     if (this.ignoreOffer) return;
 
-    await this.flushPendingCandidates();
     await this.pc.setRemoteDescription(desc);
+    await this.flushPendingCandidates();
     if (desc.type === "offer") {
-      await this.pc.setLocalDescription();
+      const answer = await this.pc.createAnswer();
+      await this.pc.setLocalDescription(answer);
       if (this.pc.localDescription) {
         this.cb.onSignal("answer", JSON.stringify(this.pc.localDescription));
       }

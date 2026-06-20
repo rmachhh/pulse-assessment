@@ -83,6 +83,7 @@ export default function Home() {
       onControl: (ctrl) => handleControl(ctrl),
       onRemoteStream: (stream) => setRemoteStream(stream),
       onConnectionState: (state) => {
+        console.log("[peer] connectionState:", state);
         if (state === "failed") {
           teardown("Connection failed (network).");
         }
