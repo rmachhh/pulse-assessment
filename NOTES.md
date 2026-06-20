@@ -32,4 +32,7 @@
     - How: tapped "Enter Pulse", allowed location when prompted, but still got "Couldn't get your location"
     - Cause: maximumAge: 0 forced a brand-new GPS fix every time, and timeout: 15_000 gave up before a phone's cold GPS start finished
     - Fix: increased timeout to 30s so GPS has enough time
--
+- Video call UI disappears behind the fullscreen video on desktop
+    - How: started a video call, the video took over the whole screen hiding all the controls including the little thumbnail.
+    - Cause: the remote video had no size limit and leaked past its container, covering the controls. The thumbnail sat behind it with z-index.
+    - Fix: added overflow-hidden to crop the frame so the video stays inside, and gave the little selfie thumbnail a proper layer
