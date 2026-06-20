@@ -19,3 +19,7 @@
     - How: Upon clicking "End" to end the session, i noticed that the opacity is still low compared to normal dot, and also i tried connecting to the user again but this time i am faced with an error.
     - Cause: The handler for the signalType "End" is not implemented, therefore the user remains in busy.
     - Fix: added an "OR" condition on the same handler as the decline.
+- Dots never disappear after a tab crash.
+    - How: force closed a tab, checked and the old dot still on the map.
+    - Cause: The heartbeat refreshed every presence row instead of only the caller’s row. As long as one user kept polling, stale users were kept alive, so the cleanup never removed them.
+    - Fix: Scoped the heartbeat update to the caller by adding `where: { id }`.
