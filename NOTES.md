@@ -28,3 +28,8 @@
     - Cause: onConnectionState only handled "failed" state not "disconnected" state.
     - Fix 1: added "disconnected" state handler to the onConnectionState so teardown fires immediately.
     - Fix 2: teardown() sends a "end" signal which clears the busy state on both peers.
+- Location access sometimes fails using mobile
+    - How: tapped "Enter Pulse", allowed location when prompted, but still got "Couldn't get your location"
+    - Cause: maximumAge: 0 forced a brand-new GPS fix every time, and timeout: 15_000 gave up before a phone's cold GPS start finished
+    - Fix: increased timeout to 30s so GPS has enough time
+-

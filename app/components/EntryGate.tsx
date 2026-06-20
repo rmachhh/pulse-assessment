@@ -21,15 +21,19 @@ export default function EntryGate({
       (pos) => onReady(pos.coords.latitude, pos.coords.longitude),
       (err) => {
         setStatus("error");
-        setError(
-          err.code === err.PERMISSION_DENIED
-            ? "Location permission is required to place you on the map."
-            : "Couldn't get your location. Please try again.",
-        );
+        if (err.code === err.PERMISSION_DENIED) {
+          setError(
+            !window.isSecureContext
+              ? "Location requires a secure connection. Open this page over HTTPS or localhost."
+              : "Location access was denied. Check your browser and device location settings, then try again.",
+          );
+        } else {
+          setError("Couldn't get your location. Please try again.");
+        }
       },
-      // High accuracy + maximumAge:0 forces a fresh fix (Wi-Fi/GPS scan)
-      // instead of reusing the browser's cached IP-based location.
-      { enableHighAccuracy: true, timeout: 15_000, maximumAge: 0 },
+      // Allow a recently-cached position so returning users load instantly,
+      // but still prefer accuracy. Give mobile GPS enough time to cold-start.
+      { enableHighAccuracy: true, timeout: 30_000, maximumAge: 60_000 },
     );
   }
 
