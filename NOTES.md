@@ -15,3 +15,7 @@
     - How: Upon successfully connected, i tried sending a message but the counterpart did not received it.
     - Cause: the sendChat() function that send a chat uses different chat type than the receiver, hence the message is silently discarded.
     - Fix: change the sendChat() function to send to the same chat type as the receiver which is the "chat" type.
+- Clicking "End" does not update the opacity of the disconnected user and remains in lower opacity, and does not update their busy status.
+    - How: Upon clicking "End" to end the session, i noticed that the opacity is still low compared to normal dot, and also i tried connecting to the user again but this time i am faced with an error.
+    - Cause: The handler for the signalType "End" is not implemented, therefore the user remains in busy.
+    - Fix: added an "OR" condition on the same handler as the decline.
