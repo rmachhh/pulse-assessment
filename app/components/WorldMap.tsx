@@ -57,9 +57,21 @@ export default function WorldMap({
         // Open centered on the user if we know where they are, else world view.
         center: me ? [me.lng, me.lat] : [0, 20],
         zoom: me ? 4 : 1.4,
+        pitch: me ? 48 : 20,
         attributionControl: true,
       });
       map.on("load", () => {
+        map.setFog({
+          color: "rgba(9, 13, 22, 0.95)",
+          "high-color": "rgba(39, 213, 191, 0.2)",
+          "horizon-blend": 0.12,
+          "space-color": "rgba(2, 6, 23, 1)",
+          "star-intensity": 0.35,
+        });
+        map.addControl(
+          new mapboxgl.NavigationControl({ visualizePitch: true }),
+          "bottom-right",
+        );
         if (!cancelled) setReady(true);
       });
       mapRef.current = map;
@@ -92,7 +104,12 @@ export default function WorldMap({
         const el = document.createElement("div");
         el.className = "pulse-me";
         el.title = "You are here";
-        el.innerHTML = `<span class="pulse-me-label">Me</span>📍`;
+        const label = document.createElement("span");
+        label.className = "pulse-me-label";
+        label.textContent = "Me";
+        const pin = document.createElement("span");
+        pin.className = "pulse-me-pin";
+        el.append(label, pin);
         // anchor "bottom" → the pin's tip sits on the exact coordinate.
         meMarkerRef.current = new mapboxgl.Marker({ element: el, anchor: "bottom" })
           .setLngLat([me.lng, me.lat])
@@ -125,7 +142,7 @@ export default function WorldMap({
         if (!marker) {
           const el = document.createElement("button");
           el.className = "pulse-dot";
-          el.style.background = dotColor(peer.id);
+          el.style.setProperty("--dot-color", dotColor(peer.id));
           el.title = "Tap to connect";
           el.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -136,7 +153,9 @@ export default function WorldMap({
             .addTo(map);
           markers.set(peer.id, marker);
         }
-        marker.getElement().style.opacity = peer.busy ? "0.35" : "1";
+        const element = marker.getElement();
+        element.classList.toggle("is-busy", peer.busy);
+        element.setAttribute("aria-label", peer.busy ? "Peer is busy" : "Tap to connect");
       }
 
       // Drop markers for peers that went offline / got filtered out.
@@ -156,6 +175,8 @@ export default function WorldMap({
   return (
     <div className="absolute inset-0">
       <div ref={containerRef} className="h-full w-full bg-zinc-900" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,transparent_0%,rgba(2,6,23,0.08)_45%,rgba(2,6,23,0.7)_100%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-zinc-950/80 to-transparent" />
 
       {!TOKEN && (
         <div className="absolute inset-0 flex items-center justify-center p-6 text-center">
@@ -167,9 +188,46 @@ export default function WorldMap({
         </div>
       )}
 
-      {/* Online count */}
-      <div className="absolute bottom-4 left-4 rounded-full bg-zinc-900/80 px-3 py-1.5 text-xs text-zinc-300 backdrop-blur">
-        {peers.length} online
+      <section className="glass-panel absolute left-3 top-3 w-[calc(100%-1.5rem)] max-w-sm rounded-lg p-4 text-zinc-100 sm:left-5 sm:top-5 sm:w-80">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200/80">
+              Pulse Live
+            </p>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight">World room</h1>
+          </div>
+          <span className="live-orb" aria-hidden="true" />
+        </div>
+        <div className="mt-4 grid grid-cols-3 gap-2 text-xs text-zinc-300">
+          <div>
+            <p className="text-2xl font-semibold text-white">{peers.length}</p>
+            <p>online</p>
+          </div>
+          <div>
+            <p className="text-2xl font-semibold text-emerald-200">P2P</p>
+            <p>chat</p>
+          </div>
+          <div>
+            <p className="text-2xl font-semibold text-amber-200">1-3km</p>
+            <p>blur</p>
+          </div>
+        </div>
+      </section>
+
+      <div className="glass-panel absolute bottom-4 left-3 rounded-lg px-4 py-3 text-xs text-zinc-200 sm:left-5">
+        <div className="flex items-center gap-3">
+          <div className="signal-bars" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+          <div>
+            <p className="font-medium text-white">
+              {canConnect ? "Ready to connect" : "Connection in progress"}
+            </p>
+            <p className="text-zinc-400">Live presence updating</p>
+          </div>
+        </div>
       </div>
     </div>
   );

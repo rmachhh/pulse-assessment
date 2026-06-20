@@ -46,3 +46,12 @@
         - The button lifts slightly when you hover over it and presses down when you click.
         - When it's finding your location, a little blinking dot appears.
     - Thinking: I want to achieve a design that feels alive and breathing, to catch user attention. So i added a pulsing animation that signals "live" or "connected" and make the overall entry gate feels alive.
+- Live Room Polish
+    - Before: After entering, the experience became mostly plain map + basic panels.
+    - Changes:
+        - Added a glass-style live HUD over the map with online count, privacy blur, and P2P status.
+        - Upgraded map dots with stronger glow, hover feedback, and a clearer busy state.
+        - Reworked the chat into a polished responsive side sheet with connection progress, softer message bubbles, and smooth message entry.
+        - Restyled connection and video prompts so requests feel like part of the same product language.
+        - Added a more premium video waiting state and live-call header.
+    - Thinking: The live room should feel like stepping into a private global radar. The UI now frames the map as the main experience while keeping chat, requests, and video calm, focused, and visually connected.

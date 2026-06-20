@@ -36,7 +36,7 @@ export default function EntryGate({
   }
 
   return (
-    <div className="relative flex min-h-full flex-1 flex-col items-center justify-center gap-10 overflow-hidden bg-zinc-950 px-6 py-12 text-zinc-100">
+    <div className="relative flex min-h-full flex-1 flex-col items-center justify-center gap-10 overflow-hidden bg-zinc-950 px-6 py-16 text-zinc-100 sm:py-12">
       {/* Ambient background: radial gradient + subtle noise feel */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(16,185,129,0.08)_0%,_transparent_70%)]" />
 
@@ -130,7 +130,7 @@ export default function EntryGate({
       )}
 
       {/* Footer */}
-      <p className="absolute bottom-6 max-w-sm text-center text-xs leading-relaxed text-zinc-700">
+      <p className="absolute bottom-[max(3.5rem,env(safe-area-inset-bottom))] max-w-sm px-6 text-center text-xs leading-relaxed text-zinc-600 sm:bottom-6">
         No sign-up. Your dot is placed 1–3 km from your real location.
         <br />
         Nothing is stored — closing the tab ends everything.
