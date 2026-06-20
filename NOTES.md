@@ -23,3 +23,8 @@
     - How: force closed a tab, checked and the old dot still on the map.
     - Cause: The heartbeat refreshed every presence row instead of only the caller’s row. As long as one user kept polling, stale users were kept alive, so the cleanup never removed them.
     - Fix: Scoped the heartbeat update to the caller by adding `where: { id }`.
+- Tab closes leaves peer hanging
+    - How: Connected to a user, then force close a tab the connected chat ui is still present, and the user remains on busy state.
+    - Cause: onConnectionState only handled "failed" state not "disconnected" state.
+    - Fix 1: added "disconnected" state handler to the onConnectionState so teardown fires immediately.
+    - Fix 2: teardown() sends a "end" signal which clears the busy state on both peers.

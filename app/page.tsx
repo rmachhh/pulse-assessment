@@ -64,6 +64,11 @@ export default function Home() {
 
   function teardown(message?: string) {
     if (requestTimer.current) clearTimeout(requestTimer.current);
+    // Let the server clear busy flags on both peers.
+    const c = connRef.current;
+    if (c.kind === "connecting" || c.kind === "connected") {
+      void sendSignal(sessionId, c.peerId, "end");
+    }
     peerRef.current?.close();
     peerRef.current = null;
     setLocalStream(null);
@@ -83,9 +88,8 @@ export default function Home() {
       onControl: (ctrl) => handleControl(ctrl),
       onRemoteStream: (stream) => setRemoteStream(stream),
       onConnectionState: (state) => {
-        console.log("[peer] connectionState:", state);
-        if (state === "failed") {
-          teardown("Connection failed (network).");
+        if (state === "disconnected" || state === "failed") {
+          teardown("Connection lost.");
         }
       },
       onChannelOpen: () => {
@@ -167,10 +171,6 @@ export default function Home() {
   }
 
   function endConnection() {
-    const c = connRef.current;
-    if (c.kind === "connecting" || c.kind === "connected") {
-      void sendSignal(sessionId, c.peerId, "end");
-    }
     teardown();
   }
 
@@ -283,6 +283,14 @@ export default function Home() {
         if (!active) return;
         setPeers(data.peers);
         for (const s of data.signals) processSignalRef.current(s);
+        // If our connected peer vanished from the map (tab close / crash /
+        // force-quit), tear down locally instead of staying stuck.
+        const c = connRef.current;
+        if (c.kind === "connecting" || c.kind === "connected") {
+          if (!data.peers.some((p) => p.id === c.peerId)) {
+            teardown("Stranger disconnected.");
+          }
+        }
       } catch {}
       if (active) timer = setTimeout(tick, POLL_INTERVAL_MS);
     };
