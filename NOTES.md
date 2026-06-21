@@ -72,3 +72,6 @@
 - The app had no browser security headers.
     - Impact: If a browser-side issue appeared later, there were fewer protections against injected scripts, clickjacking, or unsafe resource loading.
     - Fix: added CSP and security headers while allowing the Mapbox, location, camera, and microphone features Pulse needs.
+- Dependency audit reported vulnerable transitive packages.
+    - Impact: Some framework/tooling dependencies had known advisories that would show up before launch.
+    - Fix: ran `npm audit fix`, added safe package overrides, and confirmed `npm audit` reports 0 vulnerabilities.

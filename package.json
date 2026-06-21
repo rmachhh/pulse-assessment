@@ -8,6 +8,10 @@
     "start": "next start",
     "lint": "eslint"
   },
+  "overrides": {
+    "@hono/node-server": "1.19.13",
+    "postcss": "8.5.15"
+  },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
