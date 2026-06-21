@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { STALE_MS, SIGNAL_TTL_MS } from "@/lib/presence";
+import { isValidSessionId, verifySessionOwner } from "@/lib/session";
 import type { PollResponse } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -13,8 +14,11 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const id = params.get("id");
 
-  if (!id) {
-    return Response.json({ error: "missing id" }, { status: 400 });
+  if (!isValidSessionId(id)) {
+    return Response.json({ error: "invalid id" }, { status: 400 });
+  }
+  if (!(await verifySessionOwner(request, id))) {
+    return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
   const now = Date.now();

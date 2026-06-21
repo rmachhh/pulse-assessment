@@ -55,3 +55,8 @@
         - Reworked connection prompts into focused invitation cards with simple waiting progress.
         - Gave the video call a matching media-channel surface with a richer waiting state and cleaner call controls.
     - Thinking: I wanted Pulse to feel memorable from the first second without feeling like a marketing site. The gate should feel quiet, alive, and inviting, like stepping into a room where people are already present.
+
+# Phase 3
+- The API uses publicly exposed peer IDs as authentication, allowing session impersonation.
+    - Impact: Users can be impersonated easily by just knowing the exposed peer ids, leading to faking identity, kicking out someone from the app, spoof connection actions, manipulate states.
+    - Fix: moved session creation to server, added a private per-session secret stored as hash in `Presence`, set the raw secret in a HttpOnly cookie, and verifies ownership before any critical actions.

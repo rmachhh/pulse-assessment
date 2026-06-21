@@ -2,15 +2,18 @@
 import type { PollResponse, SignalType } from "@/lib/types";
 
 export async function join(
-  id: string,
   lat: number,
   lng: number,
-): Promise<void> {
-  await fetch("/api/join", {
+): Promise<string> {
+  const res = await fetch("/api/join", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id, lat, lng }),
+    body: JSON.stringify({ lat, lng }),
   });
+  if (!res.ok) throw new Error(`join failed: ${res.status}`);
+  const data = (await res.json()) as { id?: unknown };
+  if (typeof data.id !== "string") throw new Error("join failed: missing id");
+  return data.id;
 }
 
 export async function poll(id: string): Promise<PollResponse> {

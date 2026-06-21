@@ -9,7 +9,6 @@ import VideoPanel from "./components/VideoPanel";
 import { join, leave, poll, sendSignal } from "@/lib/api";
 import { PeerSession, type DescType, type PeerControl } from "@/lib/webrtc";
 import { POLL_INTERVAL_MS } from "@/lib/presence";
-import { randomId } from "@/lib/id";
 import { type PeerDot, type SignalMsg } from "@/lib/types";
 
 type Conn =
@@ -25,7 +24,7 @@ const REQUEST_TIMEOUT_MS = 30_000;
 
 export default function Home() {
   const [phase, setPhase] = useState<"gate" | "live">("gate");
-  const [sessionId] = useState(() => randomId());
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [peers, setPeers] = useState<PeerDot[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [notice, setNotice] = useState<string | null>(null);
@@ -66,7 +65,7 @@ export default function Home() {
     if (requestTimer.current) clearTimeout(requestTimer.current);
     // Let the server clear busy flags on both peers.
     const c = connRef.current;
-    if (c.kind === "connecting" || c.kind === "connected") {
+    if (sessionId && (c.kind === "connecting" || c.kind === "connected")) {
       void sendSignal(sessionId, c.peerId, "end");
     }
     peerRef.current?.close();
@@ -79,7 +78,13 @@ export default function Home() {
     if (message) showNotice(message);
   }
 
+  const teardownRef = useRef(teardown);
+  useEffect(() => {
+    teardownRef.current = teardown;
+  });
+
   function startPeer(peerId: string, initiator: boolean) {
+    if (!sessionId) return;
     const ps = new PeerSession(initiator, {
       onSignal: (type: DescType, payload: string) => {
         void sendSignal(sessionId, peerId, type, payload);
@@ -135,7 +140,7 @@ export default function Home() {
   }
 
   function requestConnection(peerId: string) {
-    if (connRef.current.kind !== "idle") return;
+    if (!sessionId || connRef.current.kind !== "idle") return;
     setConn({ kind: "requesting", peerId });
     void sendSignal(sessionId, peerId, "request");
     requestTimer.current = setTimeout(() => {
@@ -150,14 +155,14 @@ export default function Home() {
   }
 
   function cancelRequest() {
-    if (connRef.current.kind === "requesting") {
+    if (sessionId && connRef.current.kind === "requesting") {
       void sendSignal(sessionId, connRef.current.peerId, "end");
     }
     teardown();
   }
 
   function acceptIncoming() {
-    if (connRef.current.kind !== "incoming") return;
+    if (!sessionId || connRef.current.kind !== "incoming") return;
     const peerId = connRef.current.peerId;
     startPeer(peerId, false);
     void sendSignal(sessionId, peerId, "accept");
@@ -165,7 +170,7 @@ export default function Home() {
   }
 
   function declineIncoming() {
-    if (connRef.current.kind !== "incoming") return;
+    if (!sessionId || connRef.current.kind !== "incoming") return;
     void sendSignal(sessionId, connRef.current.peerId, "decline");
     setConn({ kind: "idle" });
   }
@@ -211,6 +216,7 @@ export default function Home() {
   }
 
   function processSignal(sig: SignalMsg) {
+    if (!sessionId) return;
     switch (sig.type) {
       case "request": {
         if (connRef.current.kind === "idle") {
@@ -288,7 +294,7 @@ export default function Home() {
         const c = connRef.current;
         if (c.kind === "connecting" || c.kind === "connected") {
           if (!data.peers.some((p) => p.id === c.peerId)) {
-            teardown("Stranger disconnected.");
+            teardownRef.current("Stranger disconnected.");
           }
         }
       } catch {}
@@ -315,7 +321,8 @@ export default function Home() {
 
   async function handleReady(lat: number, lng: number) {
     setMyLocation({ lat, lng });
-    await join(sessionId, lat, lng);
+    const id = await join(lat, lng);
+    setSessionId(id);
     setPhase("live");
   }
 

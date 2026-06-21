@@ -1,5 +1,11 @@
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import {
+  isValidSessionId,
+  sessionCookieName,
+  verifySessionOwner,
+} from "@/lib/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,8 +22,11 @@ export async function POST(request: NextRequest) {
     id = undefined;
   }
 
-  if (typeof id !== "string" || !id) {
+  if (!isValidSessionId(id)) {
     return Response.json({ error: "invalid id" }, { status: 400 });
+  }
+  if (!(await verifySessionOwner(request, id))) {
+    return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
   // Independent cleanup deletes — no atomicity needed (and interactive
@@ -27,5 +36,13 @@ export async function POST(request: NextRequest) {
   });
   await prisma.presence.deleteMany({ where: { id } });
 
-  return Response.json({ ok: true });
+  const response = NextResponse.json({ ok: true });
+  response.cookies.set(sessionCookieName(id), "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 0,
+  });
+  return response;
 }

@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { isValidSessionId, verifySessionOwner } from "@/lib/session";
 import type { SignalType } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -33,8 +34,11 @@ export async function POST(request: NextRequest) {
     unknown
   >;
 
-  if (typeof fromId !== "string" || typeof toId !== "string") {
+  if (!isValidSessionId(fromId) || !isValidSessionId(toId) || fromId === toId) {
     return Response.json({ error: "invalid ids" }, { status: 400 });
+  }
+  if (!(await verifySessionOwner(request, fromId))) {
+    return Response.json({ error: "unauthorized" }, { status: 401 });
   }
   if (typeof type !== "string" || !VALID_TYPES.includes(type as SignalType)) {
     return Response.json({ error: "invalid type" }, { status: 400 });
@@ -49,14 +53,14 @@ export async function POST(request: NextRequest) {
 
   const signalType = type as SignalType;
   const payloadStr = typeof payload === "string" ? payload : null;
+  const target = await prisma.presence.findUnique({
+    where: { id: toId },
+    select: { busy: true },
+  });
 
   // Enforce "one active connection at a time": if the target is already busy,
   // auto-decline the request instead of delivering it.
   if (signalType === "request") {
-    const target = await prisma.presence.findUnique({
-      where: { id: toId },
-      select: { busy: true },
-    });
     if (!target) {
       // Target went offline — tell the initiator it was declined.
       await sendDecline(toId, fromId);
@@ -66,6 +70,8 @@ export async function POST(request: NextRequest) {
       await sendDecline(toId, fromId);
       return Response.json({ ok: true, autoDeclined: true });
     }
+  } else if (!target) {
+    return Response.json({ error: "target offline" }, { status: 404 });
   }
 
   // Busy transitions:
