@@ -1,11 +1,14 @@
 import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { STALE_MS, SIGNAL_TTL_MS } from "@/lib/presence";
+import { rateLimitResponse } from "@/lib/rateLimit";
 import { isValidSessionId, verifySessionOwner } from "@/lib/session";
 import type { PollResponse } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+const MIN_POLL_INTERVAL_MS = 500;
 
 // GET /api/poll?id= — the single endpoint that drives the live map.
 // It (1) heartbeats the caller, (2) reaps stale presence + orphan signals,
@@ -26,10 +29,14 @@ export async function GET(request: NextRequest) {
   const signalCutoff = new Date(now - SIGNAL_TTL_MS);
 
   // 1) Heartbeat — refresh lastSeen for the caller.
-  await prisma.presence.updateMany({
-    where: { id },
+  const heartbeat = await prisma.presence.updateMany({
+    where: {
+      id,
+      lastSeen: { lt: new Date(now - MIN_POLL_INTERVAL_MS) },
+    },
     data: { lastSeen: new Date(now) },
   });
+  if (heartbeat.count === 0) return rateLimitResponse(1);
 
   // 2) Reap stale presence rows, their pairings, and orphaned signals
   // (independent deletes — no atomicity needed, and avoids transactions over a

@@ -63,3 +63,6 @@
 - Users could send connection signals to people they were not actually paired with.
     - Impact: Users could manipulate other people by sending fake accept/end/video connection signals, causing confusing states or failed connections.
     - Fix: added server-side pairing checks so requests, accepts, declines, video setup, and disconnects only work between users who are actually connected.
+- API endpoints had no rate limits.
+    - Impact: Users could spam joins or connection signals, creating unnecessary database load and noisy behavior for other users.
+    - Fix: added rate limits for joining and signaling, and kept polling on a soft heartbeat limit so the normal live map polling does not break.

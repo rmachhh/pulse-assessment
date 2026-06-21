@@ -48,3 +48,13 @@ model Connection {
   @@index([targetId])
   @@index([status])
 }
+
+model RateLimit {
+  // Fixed-window counters for lightweight API abuse protection.
+  key       String   @id
+  count     Int
+  expiresAt DateTime
+  updatedAt DateTime @updatedAt
+
+  @@index([expiresAt])
+}
