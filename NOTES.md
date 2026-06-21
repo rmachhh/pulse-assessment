@@ -66,3 +66,6 @@
 - API endpoints had no rate limits.
     - Impact: Users could spam joins or connection signals, creating unnecessary database load and noisy behavior for other users.
     - Fix: added rate limits for joining and signaling, and kept polling on a soft heartbeat limit so the normal live map polling does not break.
+- API routes accepted requests from any origin.
+    - Impact: Another site could try to trigger join, signal, or leave requests against the app.
+    - Fix: added an Origin check so those routes only accept same-origin browser requests.

@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { assertSameOrigin } from "@/lib/origin";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rateLimit";
 import { isValidSessionId, verifySessionOwner } from "@/lib/session";
 import type { SignalType } from "@/lib/types";
@@ -28,6 +29,9 @@ const SIGNAL_WINDOW_MS = 60 * 1000;
 // Drops one message into the recipient's mailbox. Also manages the `busy`
 // flag so a user can only be in one connection at a time.
 export async function POST(request: NextRequest) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   let body: unknown;
   try {
     body = await request.json();

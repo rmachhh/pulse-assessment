@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { applyPrivacyOffset, isValidLatLng } from "@/lib/geo";
+import { assertSameOrigin } from "@/lib/origin";
 import { checkRateLimit, clientIp, rateLimitResponse } from "@/lib/rateLimit";
 import {
   createPublicSessionId,
@@ -21,6 +22,9 @@ const JOIN_WINDOW_MS = 10 * 60 * 1000;
 // Applies a 1–3 km privacy offset and upserts the presence row. Raw
 // coordinates are never stored.
 export async function POST(request: NextRequest) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   const joinLimit = await checkRateLimit({
     key: `join:${clientIp(request)}`,
     limit: JOIN_LIMIT,

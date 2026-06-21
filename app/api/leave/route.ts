@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { assertSameOrigin } from "@/lib/origin";
 import {
   isValidSessionId,
   sessionCookieName,
@@ -14,6 +15,9 @@ export const dynamic = "force-dynamic";
 // signals to/from this user. Called via navigator.sendBeacon on tab close, so
 // the body may arrive as text — parse defensively.
 export async function POST(request: NextRequest) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   let id: string | undefined;
   try {
     const text = await request.text();
