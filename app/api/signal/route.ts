@@ -24,6 +24,9 @@ const CONTROL_SIGNAL_TYPES = ["request", "accept", "decline", "end"];
 const CONTROL_SIGNAL_LIMIT = 30;
 const WEBRTC_SIGNAL_LIMIT = 180;
 const SIGNAL_WINDOW_MS = 60 * 1000;
+const MAILBOX_SIGNAL_LIMIT = 1_000;
+const PAIR_SIGNAL_LIMIT = 300;
+const MAILBOX_CAPPED_TYPES = ["request", "offer", "answer", "ice"];
 
 // POST /api/signal — body { fromId, toId, type, payload? }
 // Drops one message into the recipient's mailbox. Also manages the `busy`
@@ -169,6 +172,20 @@ export async function POST(request: NextRequest) {
         return Response.json({ error: "invalid connection state" }, { status: 409 });
       }
       break;
+    }
+  }
+
+  if (MAILBOX_CAPPED_TYPES.includes(signalType)) {
+    const [recipientPending, pairPending] = await Promise.all([
+      prisma.signal.count({ where: { toId } }),
+      prisma.signal.count({ where: { fromId, toId } }),
+    ]);
+
+    if (recipientPending >= MAILBOX_SIGNAL_LIMIT || pairPending >= PAIR_SIGNAL_LIMIT) {
+      return Response.json(
+        { error: "signal mailbox full" },
+        { status: 429, headers: { "Retry-After": "1" } },
+      );
     }
   }
 

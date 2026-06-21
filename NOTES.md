@@ -75,3 +75,6 @@
 - Dependency audit reported vulnerable transitive packages.
     - Impact: Some framework/tooling dependencies had known advisories that would show up before launch.
     - Fix: ran `npm audit fix`, added safe package overrides, and confirmed `npm audit` reports 0 vulnerabilities.
+- Signal mailboxes had no hard size limit.
+    - Impact: If a user stopped polling or someone abused signaling, pending signals could build up in the database.
+    - Fix: added a generous mailbox cap for noisy signal types while allowing important accept, decline, and end signals through.
