@@ -69,3 +69,6 @@
 - API routes accepted requests from any origin.
     - Impact: Another site could try to trigger join, signal, or leave requests against the app.
     - Fix: added an Origin check so those routes only accept same-origin browser requests.
+- The app had no browser security headers.
+    - Impact: If a browser-side issue appeared later, there were fewer protections against injected scripts, clickjacking, or unsafe resource loading.
+    - Fix: added CSP and security headers while allowing the Mapbox, location, camera, and microphone features Pulse needs.
