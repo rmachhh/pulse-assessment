@@ -33,3 +33,18 @@ model Signal {
 
   @@index([toId])
 }
+
+model Connection {
+  // Transient pairing state for one request/active chat. Deleted when declined,
+  // ended, or when either side leaves/stales out.
+  id          String   @id @default(uuid())
+  requesterId String
+  targetId    String
+  status      String // pending | accepted
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([requesterId])
+  @@index([targetId])
+  @@index([status])
+}

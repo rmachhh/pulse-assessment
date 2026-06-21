@@ -60,3 +60,6 @@
 - The API uses publicly exposed peer IDs as authentication, allowing session impersonation.
     - Impact: Users can be impersonated easily by just knowing the exposed peer ids, leading to faking identity, kicking out someone from the app, spoof connection actions, manipulate states.
     - Fix: moved session creation to server, added a private per-session secret stored as hash in `Presence`, set the raw secret in a HttpOnly cookie, and verifies ownership before any critical actions.
+- Users could send connection signals to people they were not actually paired with.
+    - Impact: Users could manipulate other people by sending fake accept/end/video connection signals, causing confusing states or failed connections.
+    - Fix: added server-side pairing checks so requests, accepts, declines, video setup, and disconnects only work between users who are actually connected.

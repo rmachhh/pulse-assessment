@@ -17,6 +17,7 @@ const VALID_TYPES: SignalType[] = [
 ];
 
 const MAX_PAYLOAD = 64 * 1024; // SDP/ICE are small; cap to be safe.
+const LIVE_CONNECTION_STATUSES = ["pending", "accepted"];
 
 // POST /api/signal — body { fromId, toId, type, payload? }
 // Drops one message into the recipient's mailbox. Also manages the `busy`
@@ -58,35 +59,99 @@ export async function POST(request: NextRequest) {
     select: { busy: true },
   });
 
-  // Enforce "one active connection at a time": if the target is already busy,
-  // auto-decline the request instead of delivering it.
-  if (signalType === "request") {
-    if (!target) {
-      // Target went offline — tell the initiator it was declined.
-      await sendDecline(toId, fromId);
-      return Response.json({ ok: true, autoDeclined: true });
-    }
-    if (target.busy) {
-      await sendDecline(toId, fromId);
-      return Response.json({ ok: true, autoDeclined: true });
-    }
-  } else if (!target) {
-    return Response.json({ error: "target offline" }, { status: 404 });
-  }
+  switch (signalType) {
+    case "request": {
+      if (!target) {
+        await sendDecline(toId, fromId);
+        return Response.json({ ok: true, autoDeclined: true });
+      }
 
-  // Busy transitions:
-  // - accept: the connection is now active → mark BOTH peers busy.
-  // - decline/end: free both peers.
-  if (signalType === "accept") {
-    await prisma.presence.updateMany({
-      where: { id: { in: [fromId, toId] } },
-      data: { busy: true },
-    });
-  } else if (signalType === "decline" || signalType === "end") {
-    await prisma.presence.updateMany({
-      where: { id: { in: [fromId, toId] } },
-      data: { busy: false },
-    });
+      const sender = await prisma.presence.findUnique({
+        where: { id: fromId },
+        select: { busy: true },
+      });
+      const existingConnection = await prisma.connection.findFirst({
+        where: {
+          status: { in: LIVE_CONNECTION_STATUSES },
+          OR: [
+            { requesterId: { in: [fromId, toId] } },
+            { targetId: { in: [fromId, toId] } },
+          ],
+        },
+        select: { id: true },
+      });
+
+      if (!sender || sender.busy || target.busy || existingConnection) {
+        await sendDecline(toId, fromId);
+        return Response.json({ ok: true, autoDeclined: true });
+      }
+
+      await prisma.connection.create({
+        data: { requesterId: fromId, targetId: toId, status: "pending" },
+      });
+      break;
+    }
+
+    case "accept": {
+      if (!target) {
+        return Response.json({ error: "target offline" }, { status: 404 });
+      }
+      const connection = await findPendingConnection(toId, fromId);
+      if (!connection) {
+        return Response.json({ error: "invalid connection state" }, { status: 409 });
+      }
+
+      await prisma.connection.updateMany({
+        where: { id: connection.id, status: "pending" },
+        data: { status: "accepted" },
+      });
+      await prisma.presence.updateMany({
+        where: { id: { in: [fromId, toId] } },
+        data: { busy: true },
+      });
+      break;
+    }
+
+    case "decline": {
+      const connection = await findPendingConnection(toId, fromId);
+      if (!connection) {
+        return Response.json({ error: "invalid connection state" }, { status: 409 });
+      }
+
+      await prisma.connection.deleteMany({ where: { id: connection.id } });
+      await prisma.presence.updateMany({
+        where: { id: { in: [fromId, toId] } },
+        data: { busy: false },
+      });
+      break;
+    }
+
+    case "end": {
+      const connection = await findPairConnection(fromId, toId);
+      if (!connection) {
+        return Response.json({ ok: true, ignored: true });
+      }
+
+      await prisma.connection.deleteMany({ where: { id: connection.id } });
+      await prisma.presence.updateMany({
+        where: { id: { in: [fromId, toId] } },
+        data: { busy: false },
+      });
+      break;
+    }
+
+    case "offer":
+    case "answer":
+    case "ice": {
+      if (!target) {
+        return Response.json({ error: "target offline" }, { status: 404 });
+      }
+      const connection = await findPairConnection(fromId, toId, "accepted");
+      if (!connection) {
+        return Response.json({ error: "invalid connection state" }, { status: 409 });
+      }
+      break;
+    }
   }
 
   await prisma.signal.create({
@@ -100,5 +165,29 @@ export async function POST(request: NextRequest) {
 async function sendDecline(targetId: string, initiatorId: string) {
   await prisma.signal.create({
     data: { fromId: targetId, toId: initiatorId, type: "decline", payload: null },
+  });
+}
+
+async function findPendingConnection(requesterId: string, targetId: string) {
+  return prisma.connection.findFirst({
+    where: { requesterId, targetId, status: "pending" },
+    select: { id: true },
+  });
+}
+
+async function findPairConnection(
+  firstId: string,
+  secondId: string,
+  status?: "pending" | "accepted",
+) {
+  return prisma.connection.findFirst({
+    where: {
+      ...(status ? { status } : { status: { in: LIVE_CONNECTION_STATUSES } }),
+      OR: [
+        { requesterId: firstId, targetId: secondId },
+        { requesterId: secondId, targetId: firstId },
+      ],
+    },
+    select: { id: true },
   });
 }

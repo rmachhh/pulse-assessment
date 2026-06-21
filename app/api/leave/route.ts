@@ -29,12 +29,29 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
+  const connections = await prisma.connection.findMany({
+    where: { OR: [{ requesterId: id }, { targetId: id }] },
+    select: { requesterId: true, targetId: true },
+  });
+  const releasedIds = connections
+    .flatMap((connection) => [connection.requesterId, connection.targetId])
+    .filter((peerId) => peerId !== id);
+
   // Independent cleanup deletes — no atomicity needed (and interactive
   // transactions are unreliable over a PgBouncer pooler).
   await prisma.signal.deleteMany({
     where: { OR: [{ toId: id }, { fromId: id }] },
   });
+  await prisma.connection.deleteMany({
+    where: { OR: [{ requesterId: id }, { targetId: id }] },
+  });
   await prisma.presence.deleteMany({ where: { id } });
+  if (releasedIds.length > 0) {
+    await prisma.presence.updateMany({
+      where: { id: { in: releasedIds } },
+      data: { busy: false },
+    });
+  }
 
   const response = NextResponse.json({ ok: true });
   response.cookies.set(sessionCookieName(id), "", {

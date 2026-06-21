@@ -31,9 +31,44 @@ export async function GET(request: NextRequest) {
     data: { lastSeen: new Date(now) },
   });
 
-  // 2) Reap stale presence rows and orphaned signals (independent deletes —
-  // no atomicity needed, and avoids transactions over a PgBouncer pooler).
-  await prisma.presence.deleteMany({ where: { lastSeen: { lt: staleCutoff } } });
+  // 2) Reap stale presence rows, their pairings, and orphaned signals
+  // (independent deletes — no atomicity needed, and avoids transactions over a
+  // PgBouncer pooler).
+  const stalePresence = await prisma.presence.findMany({
+    where: { lastSeen: { lt: staleCutoff } },
+    select: { id: true },
+  });
+  const staleIds = stalePresence.map((p) => p.id);
+  if (staleIds.length > 0) {
+    const staleConnections = await prisma.connection.findMany({
+      where: {
+        OR: [
+          { requesterId: { in: staleIds } },
+          { targetId: { in: staleIds } },
+        ],
+      },
+      select: { requesterId: true, targetId: true },
+    });
+    const releasedIds = staleConnections
+      .flatMap((c) => [c.requesterId, c.targetId])
+      .filter((peerId) => !staleIds.includes(peerId));
+
+    await prisma.presence.deleteMany({ where: { id: { in: staleIds } } });
+    await prisma.connection.deleteMany({
+      where: {
+        OR: [
+          { requesterId: { in: staleIds } },
+          { targetId: { in: staleIds } },
+        ],
+      },
+    });
+    if (releasedIds.length > 0) {
+      await prisma.presence.updateMany({
+        where: { id: { in: releasedIds } },
+        data: { busy: false },
+      });
+    }
+  }
   await prisma.signal.deleteMany({ where: { createdAt: { lt: signalCutoff } } });
 
   // 3) Online peers, excluding self.
