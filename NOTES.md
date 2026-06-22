@@ -78,3 +78,22 @@
 - Signal mailboxes had no hard size limit.
     - Impact: If a user stopped polling or someone abused signaling, pending signals could build up in the database.
     - Fix: added a generous mailbox cap for noisy signal types while allowing important accept, decline, and end signals through.
+# Phase 4
+- Pulse Bridge + message pulses
+    - What: When two users connect, it draws a bridge and reveals a short "Moment" card with distance and other information. Each message are send with light indicators, flashes the path, and lands as a ripple.
+    - Why: I wanted to depict the feeling of connection, like not just a chat message or chatting with stranger, rather to feel like there is a real connection between the two strangers.
+- Live Echo
+    - What: The chatroom now feels alive, with presence indicator such as mouse movement, typing indicators.
+    - Why: I wanted the chatroom to feel like there's a presence, not just an ordinary chatroom, rather there is a way to communicate with movement and make each other feel the presence.
+- Shared Pulse Prompt
+    - What: Each connection will have an opener, or a topic to discuss, just to remove awkwardness, so that they will have a way to start the conversation.
+    - Why: I want to remove the feeling of "what should i say" or the awkward feeling of talking to a stranger.
+- Goodbye Bloom
+    - What: Ending a room triggers a short summary of what happened, and a bloom.
+    - Why: Pulse's no-history promise becomes visible at the end of the interaction instead of just being stated in copy.
+- Living Map Effects
+    - What: The map have couple of live indicators, such as join and leave ripples, and the aurora mode that gives a little bit of fun.
+    - Why: The map should feel alive even before a chat starts. Join/leave ripples make the presence layer feel real-time, and the aurora mode gives connected rooms a more memorable screenshot moment.
+- Ambient Controls + Pulse Passport
+    - What: Added optional sound ambient toggle to enable subtle sound cues, and a HUD hiding functionality, also added a pulse passport history that records what is happening with the interactions, remember this still abides the promise of no history as this is purely local.
+    - Why: The app now has a stronger beginning, middle, and ending: enter the living map, form a bridge, share a prompt, feel presence, and leave with a temporary stamp that reinforces that nothing durable was kept.

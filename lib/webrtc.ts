@@ -4,11 +4,16 @@ export type PeerControl =
   | "video-accept"
   | "video-decline"
   | "video-end";
+export type PeerPresence =
+  | { kind: "cursor"; x: number; y: number }
+  | { kind: "tap"; x: number; y: number }
+  | { kind: "typing"; active: boolean };
 
 interface PeerCallbacks {
   onSignal: (type: DescType, payload: string) => void;
   onChat: (text: string) => void;
   onControl: (ctrl: PeerControl) => void;
+  onPresence: (presence: PeerPresence) => void;
   onRemoteStream: (stream: MediaStream | null) => void;
   onConnectionState: (state: RTCPeerConnectionState) => void;
   onChannelOpen: () => void;
@@ -81,6 +86,9 @@ export class PeerSession {
           this.cb.onChat(msg.text);
         } else if (msg.t === "ctrl" && typeof msg.ctrl === "string") {
           this.cb.onControl(msg.ctrl as PeerControl);
+        } else if (msg.t === "presence") {
+          const presence = parsePresence(msg.presence);
+          if (presence) this.cb.onPresence(presence);
         }
       } catch {}
     };
@@ -138,6 +146,10 @@ export class PeerSession {
     this.safeSend({ t: "ctrl", ctrl });
   }
 
+  sendPresence(presence: PeerPresence) {
+    this.safeSend({ t: "presence", presence });
+  }
+
   private safeSend(obj: unknown) {
     if (this.dc && this.dc.readyState === "open") {
       this.dc.send(JSON.stringify(obj));
@@ -184,4 +196,33 @@ export class PeerSession {
       this.pc.close();
     } catch {}
   }
+}
+
+function parsePresence(value: unknown): PeerPresence | null {
+  const data = value as Partial<PeerPresence> | null;
+  if (!data || typeof data !== "object" || typeof data.kind !== "string") {
+    return null;
+  }
+
+  if (data.kind === "typing") {
+    return typeof data.active === "boolean"
+      ? { kind: "typing", active: data.active }
+      : null;
+  }
+
+  if (
+    (data.kind === "cursor" || data.kind === "tap") &&
+    typeof data.x === "number" &&
+    typeof data.y === "number" &&
+    Number.isFinite(data.x) &&
+    Number.isFinite(data.y)
+  ) {
+    return {
+      kind: data.kind,
+      x: Math.max(0, Math.min(1, data.x)),
+      y: Math.max(0, Math.min(1, data.y)),
+    };
+  }
+
+  return null;
 }
